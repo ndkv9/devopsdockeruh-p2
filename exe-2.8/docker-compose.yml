@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  backend:
+    image: be-app
+    environment:
+      - REDIS_HOST=redis
+      - POSTGRES_HOST=db
+    ports:
+      - 8080
+
+  frontend:
+    image: fe-app
+    ports:
+      - 5000
+
+  redis:
+    image: redis
+    volumes:
+      - ./redis:/data
+
+  db:
+    image: postgres:13.2-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DATABASE: postgres
+    volumes:
+      - ./database:/var/lib/postgresql/data
+
+  nginx:
+    image: nginx:1.20.1
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - 8080:80
+    container_name: reverse-proxy
